@@ -1,0 +1,94 @@
+# Default values for mcp-gateway-operator
+
+# Replica count for the operator deployment
+replicaCount: 1
+
+# Container image configuration
+image:
+  repository: mcp-gateway-operator
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion
+  tag: ""
+
+# Image pull secrets for private registries
+imagePullSecrets: []
+
+# Override the name of the chart
+nameOverride: ""
+# Override the full name of the chart
+fullnameOverride: ""
+
+# ServiceAccount configuration
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials
+  automount: true
+  # Annotations to add to the service account (e.g., for IRSA)
+  annotations: {}
+    # eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/mcp-gateway-operator-role
+  # The name of the service account to use
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# Pod annotations
+podAnnotations: {}
+
+# Pod security context
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+  fsGroup: 65532
+
+# Container security context
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+
+# Resource limits and requests
+resources:
+  limits:
+    cpu: 500m
+    memory: 128Mi
+  requests:
+    cpu: 10m
+    memory: 64Mi
+
+# Node selector for pod assignment
+nodeSelector: {}
+
+# Tolerations for pod assignment
+tolerations: []
+
+# Affinity for pod assignment
+affinity: {}
+
+# AWS configuration
+aws:
+  # AWS Bedrock gateway identifier (required)
+  gatewayId: ""
+  # AWS region (optional, defaults to the region from AWS SDK config)
+  region: ""
+
+# Operator configuration
+operator:
+  # Enable leader election for high availability
+  leaderElection: false
+  # Metrics server configuration
+  metrics:
+    # Enable secure metrics endpoint
+    secure: true
+    # Bind address for metrics endpoint
+    bindAddress: "0"
+  # Health probe bind address
+  healthProbeBindAddress: ":8081"
+  # Enable HTTP/2 for metrics and webhook servers
+  enableHTTP2: false
+
+# RBAC configuration
+rbac:
+  # Specifies whether RBAC resources should be created
+  create: true

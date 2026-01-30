@@ -1,0 +1,39 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mock-mcp-server
+  namespace: mock-mcp-server
+  annotations:
+    # Use AWS ALB
+    kubernetes.io/ingress.class: alb
+    
+    # ALB configuration
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    
+    # HTTPS configuration with ACM certificate
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-west-2:820537372947:certificate/b78b1865-a798-40c1-8b41-d62d484753aa
+    
+    # SSL policy
+    alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS13-1-2-2021-06
+    
+    # Health check configuration
+    alb.ingress.kubernetes.io/healthcheck-path: /health
+    alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
+    alb.ingress.kubernetes.io/backend-protocol: HTTP
+    
+    # Tags for the ALB
+    alb.ingress.kubernetes.io/tags: Environment=test,Application=mock-mcp-server
+spec:
+  rules:
+  - host: mcp-test.jicomusic.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: mock-mcp-server
+            port:
+              number: 80

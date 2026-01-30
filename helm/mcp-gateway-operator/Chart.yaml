@@ -1,0 +1,18 @@
+apiVersion: v2
+name: mcp-gateway-operator
+description: A Kubernetes operator that automatically creates AWS Bedrock AgentCore gateway targets for MCP servers
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - kubernetes
+  - operator
+  - aws
+  - bedrock
+  - mcp
+  - gateway
+maintainers:
+  - name: AWS
+    url: https://github.com/aws/mcp-gateway-operator
+sources:
+  - https://github.com/aws/mcp-gateway-operator

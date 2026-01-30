@@ -1,0 +1,35 @@
+{{- if .Values.rbac.create -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "mcp-gateway-operator.fullname" . }}-manager-role
+  labels:
+    {{- include "mcp-gateway-operator.labels" . | nindent 4 }}
+rules:
+- apiGroups:
+  - mcpgateway.bedrock.aws
+  resources:
+  - mcpservers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - mcpgateway.bedrock.aws
+  resources:
+  - mcpservers/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - mcpgateway.bedrock.aws
+  resources:
+  - mcpservers/status
+  verbs:
+  - get
+  - patch
+  - update
+{{- end }}

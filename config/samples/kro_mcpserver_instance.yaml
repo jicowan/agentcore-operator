@@ -1,0 +1,8 @@
+apiVersion: apps.example.com/v1alpha1
+kind: MCPServerApp
+metadata:
+  name: my-mcp-server
+  namespace: default
+spec:
+  description: My custom MCP server for testing
+  endpoint: https://mcp-test.jicomusic.com

@@ -1,0 +1,61 @@
+apiVersion: mcpgateway.bedrock.aws/v1alpha1
+kind: MCPServer
+metadata:
+  name: mcpserver-metadata-sample
+  labels:
+    app.kubernetes.io/name: mcp-gateway-operator
+    app.kubernetes.io/managed-by: kustomize
+spec:
+  # HTTPS endpoint of the MCP server (required)
+  endpoint: https://mcp-server-metadata.example.com
+
+  # Server capabilities - must include "tools" (required)
+  capabilities:
+    - tools
+
+  # Authentication type: OAuth2 (required for MCP servers)
+  # Note: MCP server targets only support OAuth2 authentication
+  authType: OAuth2
+
+  # OAuth provider ARN (required)
+  # This should be the ARN of an OAuth2 credential provider created in Bedrock AgentCore
+  oauthProviderArn: arn:aws:bedrock-agentcore:us-east-1:123456789012:token-vault/default/oauth2credentialprovider/my-oauth-provider
+
+  # OAuth scopes (optional)
+  oauthScopes:
+    - read
+    - write
+
+  # Optional: Description for the gateway target
+  description: "MCP server with metadata propagation"
+
+  # Metadata propagation configuration
+  # These settings control which HTTP headers and query parameters are forwarded
+  # from the gateway to the MCP server
+
+  # Allowed request headers to propagate
+  # These headers will be forwarded from incoming requests to the MCP server
+  allowedRequestHeaders:
+    - X-Custom-Header
+    - X-Request-ID
+    - Authorization
+
+  # Allowed query parameters to propagate
+  # These query parameters will be forwarded from incoming requests to the MCP server
+  allowedQueryParameters:
+    - filter
+    - page
+    - limit
+
+  # Allowed response headers to propagate
+  # These headers will be forwarded from the MCP server response back to the client
+  allowedResponseHeaders:
+    - X-Response-ID
+    - X-Rate-Limit-Remaining
+    - X-Rate-Limit-Reset
+
+  # Optional: Custom target name (defaults to resource name)
+  # targetName: my-metadata-target
+
+  # Optional: Gateway ID (defaults to GATEWAY_ID environment variable)
+  # gatewayId: gateway-abc123

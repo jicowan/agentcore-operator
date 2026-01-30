@@ -1,0 +1,65 @@
+apiVersion: kro.run/v1alpha1
+kind: ResourceGraphDefinition
+metadata:
+  name: mcpserver
+  namespace: default
+spec:
+  schema:
+    apiVersion: v1alpha1
+    kind: MCPServerApp
+    group: apps.example.com
+    
+    spec:
+      # User-configurable fields
+      description: string | required | minLength=10 | maxLength=200
+      endpoint: string | required | pattern=^https://.*
+    
+    status:
+      # Project status from MCPServer
+      targetId: ${mcpserver.status.?targetId.orValue("")}
+      targetStatus: ${mcpserver.status.?targetStatus.orValue("PENDING")}
+      gatewayArn: ${mcpserver.status.?gatewayArn.orValue("")}
+      ready: ${mcpserver.status.conditions.exists(c, c.type == "Ready" && c.status == "True")}
+      message: ${mcpserver.status.conditions.exists(c, c.type == "Ready") ? mcpserver.status.conditions.filter(c, c.type == "Ready")[0].message : "Waiting for gateway target creation"}
+    
+    additionalPrinterColumns:
+      - name: Endpoint
+        type: string
+        jsonPath: .spec.endpoint
+        description: MCP server endpoint
+      - name: Status
+        type: string
+        jsonPath: .status.targetStatus
+        description: Gateway target status
+      - name: Ready
+        type: boolean
+        jsonPath: .status.ready
+        description: Whether the gateway target is ready
+      - name: Age
+        type: date
+        jsonPath: .metadata.creationTimestamp
+  
+  resources:
+    - id: mcpserver
+      template:
+        apiVersion: mcpgateway.bedrock.aws/v1alpha1
+        kind: MCPServer
+        metadata:
+          name: ${schema.metadata.name}
+          namespace: ${schema.metadata.namespace}
+        spec:
+          # User-provided values
+          endpoint: ${schema.spec.endpoint}
+          description: ${schema.spec.description}
+          
+          # Static values (configured by platform team)
+          authType: OAuth2
+          oauthProviderArn: arn:aws:bedrock-agentcore:us-west-2:820537372947:token-vault/default/oauth2credentialprovider/test-mcp-oauth-https
+          oauthScopes:
+            - read
+            - write
+          capabilities:
+            - tools
+      
+      readyWhen:
+        - ${mcpserver.status.conditions.exists(c, c.type == "Ready" && c.status == "True")}
