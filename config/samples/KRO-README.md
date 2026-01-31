@@ -61,7 +61,7 @@ spec:
   name: my-mcp-server
   namespace: default
   description: My custom MCP server for testing
-  endpoint: https://mcp-test.jicomusic.com
+  endpoint: https://mcp-test.example.com
 ```
 
 Apply it:
@@ -119,7 +119,7 @@ The following values are statically configured in the RGD and cannot be changed 
 
 ```yaml
 authType: OAuth2
-oauthProviderArn: arn:aws:bedrock-agentcore:us-west-2:820537372947:token-vault/default/oauth2credentialprovider/test-mcp-oauth-https
+oauthProviderArn: arn:aws:bedrock-agentcore:<region>:XXXXXXXXXXXX:token-vault/default/oauth2credentialprovider/test-mcp-oauth-https
 oauthScopes:
   - read
   - write
