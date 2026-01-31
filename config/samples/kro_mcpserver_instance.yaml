@@ -5,4 +5,4 @@ metadata:
   namespace: default
 spec:
   description: My custom MCP server for testing
-  endpoint: https://mcp-test.jicomusic.com
+  endpoint: https://mcp-test.example.com
