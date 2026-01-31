@@ -54,7 +54,7 @@ spec:
           
           # Static values (configured by platform team)
           authType: OAuth2
-          oauthProviderArn: arn:aws:bedrock-agentcore:us-west-2:820537372947:token-vault/default/oauth2credentialprovider/test-mcp-oauth-https
+          oauthProviderArn: arn:aws:bedrock-agentcore:us-west-2:XXXXXXXXXXXX:token-vault/default/oauth2credentialprovider/test-mcp-oauth-https
           oauthScopes:
             - read
             - write
