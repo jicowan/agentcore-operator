@@ -4,11 +4,11 @@ A Kubernetes operator that automatically creates AWS Bedrock AgentCore gateway t
 
 ## Overview
 
-The MCP Gateway Operator watches for `MCPServer` custom resources in your Kubernetes cluster and automatically registers them as gateway targets in AWS Bedrock AgentCore. This enables seamless integration between your MCP servers running in Kubernetes and AWS Bedrock agents.
+The AgentCore Operator watches for `MCPServer` custom resources in your Kubernetes cluster and automatically registers them as gateway targets in AgentCore. This enables seamless integration between your MCP servers running in Kubernetes and AgentCore agents.
 
 ### Key Features
 
-- **Automatic Gateway Target Management**: Creates, updates, and deletes Bedrock gateway targets based on Kubernetes resources
+- **Automatic Gateway Target Management**: Creates, updates, and deletes AgentCore gateway targets based on Kubernetes resources
 - **OAuth2 Authentication**: Secure authentication using OAuth2 credential providers (required for MCP servers)
 - **Metadata Propagation**: Configure which HTTP headers and query parameters are forwarded to MCP servers
 - **IRSA Integration**: Uses IAM Roles for Service Accounts for secure AWS authentication
@@ -18,8 +18,8 @@ The MCP Gateway Operator watches for `MCPServer` custom resources in your Kubern
 ## Prerequisites
 
 - Kubernetes 1.19+ (EKS recommended for IRSA support)
-- AWS Bedrock AgentCore gateway created
-- IAM role with permissions to manage Bedrock gateway targets
+- AgentCore Gateway
+- IAM role with permissions to create, get, list, update, and delete gateway targets
 - Helm 3.0+ (for installation)
 
 ## Quick Start
@@ -37,7 +37,7 @@ helm install mcp-gateway-operator ./helm/mcp-gateway-operator \
 
 ### 2. Create an MCPServer Resource
 
-**Important**: MCP server targets only support OAuth2 authentication. You must create an OAuth2 credential provider in Bedrock AgentCore before creating an MCPServer resource.
+**Important**: MCP server targets only support OAuth2 authentication. You must create an OAuth2 credential provider in AgentCore before creating an MCPServer resource.
 
 ```yaml
 apiVersion: mcpgateway.bedrock.aws/v1alpha1
@@ -46,7 +46,6 @@ metadata:
   name: my-mcp-server
 spec:
   endpoint: https://mcp-server.example.com
-  protocolVersion: "2025-06-18"
   capabilities:
     - tools
   authType: OAuth2
@@ -81,11 +80,11 @@ The operator requires an IAM role with the following permissions:
     {
       "Effect": "Allow",
       "Action": [
-        "bedrock-agentcore-control:CreateGatewayTarget",
-        "bedrock-agentcore-control:GetGatewayTarget",
-        "bedrock-agentcore-control:UpdateGatewayTarget",
-        "bedrock-agentcore-control:DeleteGatewayTarget",
-        "bedrock-agentcore-control:ListGatewayTargets"
+        "bedrock-agentcore:CreateGatewayTarget",
+        "bedrock-agentcore:GetGatewayTarget",
+        "bedrock-agentcore:UpdateGatewayTarget",
+        "bedrock-agentcore:DeleteGatewayTarget",
+        "bedrock-agentcore:ListGatewayTargets"
       ],
       "Resource": [
         "arn:aws:bedrock-agentcore:*:*:gateway/*",
@@ -115,15 +114,12 @@ spec:
   # Required: HTTPS endpoint of the MCP server
   endpoint: https://mcp-server.example.com
   
-  # Required: MCP protocol version (defaults to 2025-06-18)
-  protocolVersion: "2025-06-18"
-  
   # Required: Server capabilities (must include "tools")
   capabilities:
     - tools
   
-  # Optional: Authentication type (NoAuth or OAuth2, defaults to NoAuth)
-  authType: NoAuth
+  # Authentication type: OAuth2 (Remote MCP Servers only support OAuth2)
+  authType: OAuth2
   
   # Optional: Custom target name (defaults to resource name)
   targetName: my-custom-target
@@ -136,15 +132,6 @@ spec:
 ```
 
 ### Authentication Methods
-
-#### NoAuth (IAM Role)
-
-Uses the gateway's IAM role for authentication:
-
-```yaml
-spec:
-  authType: NoAuth
-```
 
 #### OAuth2
 
@@ -179,7 +166,6 @@ spec:
 
 See the [config/samples](config/samples/) directory for complete examples:
 
-- [NoAuth example](config/samples/mcpgateway_v1alpha1_mcpserver_noauth.yaml)
 - [OAuth2 example](config/samples/mcpgateway_v1alpha1_mcpserver_oauth2.yaml)
 - [Metadata propagation example](config/samples/mcpgateway_v1alpha1_mcpserver_metadata.yaml)
 
@@ -229,7 +215,6 @@ kubectl describe mcpserver <name>
 
 The operator validates:
 - Endpoint must start with `https://`
-- Protocol version must be `2025-06-18` or `2025-03-26`
 - Capabilities must include `tools`
 - OAuth2 requires `oauthProviderArn`
 
